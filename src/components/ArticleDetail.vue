@@ -1,5 +1,5 @@
 <template>
-  <div v-if="article" class="w-full mx-auto max-w-screen-xl">
+  <div v-if="article" class="w-full mx-auto max-w-screen-xl article">
     <h1 class="text-3xl font-bold mb-4">{{ article.title }}</h1>
     <img
       v-if="article.imageUrl"
@@ -77,3 +77,6 @@ export default {
   },
 };
 </script>
+
+<style>
+</style>

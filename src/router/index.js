@@ -32,6 +32,11 @@ const routes = [
     path: '/login',
     name: 'login',
     component: Login
+  },
+  {
+    path: '/clanky',
+    name: 'articleList',
+    component: ArticleList
   }
 ];
 

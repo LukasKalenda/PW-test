@@ -7,16 +7,16 @@
       class="w-full p-2 mb-4 border rounded"
     />
     <div class="mb-4">
-      <label class="block mb-2">Náhledový obrázek:</label>
+      <label class="block mb-2">Náhledový obrázek URL:</label>
       <input
-        type="file"
-        @change="handleImageUpload"
-        accept="image/*"
-        class="mb-2"
+        v-model="imageUrl"
+        type="url"
+        placeholder="https://example.com/image.jpg"
+        class="w-full p-2 mb-2 border rounded"
       />
       <img
-        v-if="imagePreview"
-        :src="imagePreview"
+        v-if="imageUrl"
+        :src="imageUrl"
         alt="Preview"
         class="max-w-xs"
       />
@@ -35,8 +35,13 @@
         toolbar:
           'undo redo | formatselect | bold italic backcolor | \
           alignleft aligncenter alignright alignjustify | \
-          bullist numlist outdent indent | removeformat | image | help',
-        images_upload_handler: handleEditorImageUpload
+          bullist numlist outdent indent | removeformat | image link | help',
+        image_advtab: true,
+        image_uploadtab: false,
+        image_description: false,
+        object_resizing: 'img',
+        file_picker_types: 'image',
+        file_picker_callback: this.handleFilePicker
       }"
     />
     <button
@@ -54,9 +59,8 @@
 <script>
 import Editor from "@tinymce/tinymce-vue";
 import slugify from "slugify";
-import { db, storage } from "@/firebase";
+import { db } from "@/firebase";
 import { collection, addDoc } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 export default {
   components: {
@@ -66,32 +70,24 @@ export default {
     return {
       title: "",
       content: "",
-      imageFile: null,
-      imagePreview: null,
+      imageUrl: "",
       isSaving: false,
       saveError: null,
       saveSuccess: null,
     };
   },
   methods: {
-    handleImageUpload(event) {
-      this.imageFile = event.target.files[0];
-      this.imagePreview = URL.createObjectURL(this.imageFile);
-    },
+    handleFilePicker(callback, value, meta) {
+      const input = document.createElement('input');
+      input.setAttribute('type', 'text');
+      input.setAttribute('placeholder', 'Vložte URL obrázku');
 
-    async handleEditorImageUpload(blobInfo, progress) {
-      return new Promise(async (resolve, reject) => {
-        try {
-          const file = blobInfo.blob();
-          const fileName = blobInfo.filename();
-          const storageRef = ref(storage, `article-content-images/${Date.now()}-${fileName}`);
-          const snapshot = await uploadBytes(storageRef, file);
-          const imageUrl = await getDownloadURL(snapshot.ref);
-          resolve(imageUrl);
-        } catch (error) {
-          reject('Image upload failed');
-        }
-      });
+      input.onchange = function () {
+        const url = this.value;
+        callback(url, { alt: '' });
+      };
+
+      input.click();
     },
 
     async saveArticle() {
@@ -107,29 +103,27 @@ export default {
       try {
         const slug = slugify(this.title, { lower: true, strict: true });
 
-        let imageUrl = null;
-        if (this.imageFile) {
-          const storageRef = ref(
-            storage,
-            `article-images/${slug}-${Date.now()}`
-          );
-          const snapshot = await uploadBytes(storageRef, this.imageFile);
-          imageUrl = await getDownloadURL(snapshot.ref);
+        // Extrahujte URL obrázků z obsahu
+        const imgRegex = /<img[^>]+src="?([^"\s]+)"?\s*\/?>/g;
+        const contentImageUrls = [];
+        let match;
+        while (match = imgRegex.exec(this.content)) {
+          contentImageUrls.push(match[1]);
         }
 
         await addDoc(collection(db, "articles"), {
           title: this.title,
           content: this.content,
           slug: slug,
-          imageUrl: imageUrl,
+          imageUrl: this.imageUrl,
+          contentImageUrls: contentImageUrls,
           createdAt: new Date(),
         });
 
         this.saveSuccess = "Článek byl úspěšně uložen!";
         this.title = "";
         this.content = "";
-        this.imageFile = null;
-        this.imagePreview = null;
+        this.imageUrl = "";
       } catch (error) {
         console.error("Chyba při ukládání článku:", error);
         this.saveError =

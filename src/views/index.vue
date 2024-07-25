@@ -11,8 +11,6 @@
             <Button :buttonText="b"></Button>
           </div>
         </div>
-
-        <Development></Development>
       </div>
     </div>
 
@@ -148,8 +146,7 @@
         <Button buttonText="Odeslat" additionalClass="bg-red-500 font-bold flex justify-right"></Button>
       </div>
     </section>
-
-    <ArticleList></ArticleList>
+    <LatestArticles></LatestArticles>
   </div>
 </template>
 
@@ -157,8 +154,8 @@
 import Card from "../components/Card.vue";
 import TypeWriter from "../components/TypeWriter.vue";
 import Button from "../components/Button.vue";
-import Development from "./Development.vue";
 import ArticleList from "@/components/ArticleList.vue";
+import LatestArticles from "@/components/LatestArticles.vue";
 
 const buttons = ["Development", "Design", "3D prints"];
 </script>
