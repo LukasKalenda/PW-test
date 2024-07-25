@@ -92,30 +92,21 @@ export default {
 
         let imageUrl = null;
         if (this.imageFile) {
-          try {
-            const storageRef = ref(
-              storage,
-              `article-images/${slug}-${Date.now()}`
-            );
-            const snapshot = await uploadBytes(storageRef, this.imageFile);
-            console.log("Uploaded a blob or file!", snapshot);
-            imageUrl = await getDownloadURL(snapshot.ref);
-            console.log("File available at", imageUrl);
-          } catch (uploadError) {
-            console.error("Chyba při nahrávání obrázku:", uploadError);
-            throw new Error("Nepodařilo se nahrát obrázek.");
-          }
+          const storageRef = ref(
+            storage,
+            `article-images/${slug}-${Date.now()}`
+          );
+          const snapshot = await uploadBytes(storageRef, this.imageFile);
+          imageUrl = await getDownloadURL(snapshot.ref);
         }
 
-        const docRef = await addDoc(collection(db, "articles"), {
+        await addDoc(collection(db, "articles"), {
           title: this.title,
           content: this.content,
           slug: slug,
           imageUrl: imageUrl,
           createdAt: new Date(),
         });
-
-        console.log("Document written with ID: ", docRef.id);
 
         this.saveSuccess = "Článek byl úspěšně uložen!";
         this.title = "";
@@ -124,7 +115,8 @@ export default {
         this.imagePreview = null;
       } catch (error) {
         console.error("Chyba při ukládání článku:", error);
-        this.saveError = `Nastala chyba při ukládání článku: ${error.message}`;
+        this.saveError =
+          "Nastala chyba při ukládání článku. Zkuste to prosím znovu.";
       } finally {
         this.isSaving = false;
       }

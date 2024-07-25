@@ -1,10 +1,18 @@
 <template>
-  <div>
-    <h1 v-if="article">{{ article.title }}</h1>
-    <p v-if="article" v-html="article.content"></p>
-    <p v-if="!article && !error">Načítání článku...</p>
-    <p v-if="error">{{ error }}</p>
+<template>
+  <div v-if="article" class="container mx-auto p-4">
+    <h1 class="text-3xl font-bold mb-4">{{ article.title }}</h1>
+    <img v-if="article.imageUrl" :src="article.imageUrl" alt="Article image" class="mb-4 max-w-lg">
+    <div v-html="article.content"></div>
+    <p class="text-gray-600 mt-4">{{ formatDate(article.createdAt) }}</p>
   </div>
+  <div v-else-if="error" class="text-red-500">
+    {{ error }}
+  </div>
+  <div v-else class="text-gray-600">
+    Načítání článku...
+  </div>
+</template>
 </template>
 
 <script>
