@@ -1,5 +1,5 @@
 <template>
-  <div class="container mx-auto p-4">
+  <div class="w-full mx-auto max-w-screen-xl">
     <h2 class="text-2xl font-bold mb-4">Editor článku</h2>
     <input
       v-model="title"
@@ -26,16 +26,17 @@
       v-model="content"
       :init="{
         height: 500,
-        menubar: false,
+        menubar: 'file edit view insert format tools table help',
         plugins: [
           'advlist autolink lists link image charmap print preview anchor',
           'searchreplace visualblocks code fullscreen',
-          'insertdatetime media table paste code help wordcount',
+          'insertdatetime media table paste code help wordcount'
         ],
         toolbar:
           'undo redo | formatselect | bold italic backcolor | \
           alignleft aligncenter alignright alignjustify | \
-          bullist numlist outdent indent | removeformat | help',
+          bullist numlist outdent indent | removeformat | image | help',
+        images_upload_handler: handleEditorImageUpload
       }"
     />
     <button
@@ -77,6 +78,22 @@ export default {
       this.imageFile = event.target.files[0];
       this.imagePreview = URL.createObjectURL(this.imageFile);
     },
+
+    async handleEditorImageUpload(blobInfo, progress) {
+      return new Promise(async (resolve, reject) => {
+        try {
+          const file = blobInfo.blob();
+          const fileName = blobInfo.filename();
+          const storageRef = ref(storage, `article-content-images/${Date.now()}-${fileName}`);
+          const snapshot = await uploadBytes(storageRef, file);
+          const imageUrl = await getDownloadURL(snapshot.ref);
+          resolve(imageUrl);
+        } catch (error) {
+          reject('Image upload failed');
+        }
+      });
+    },
+
     async saveArticle() {
       if (!this.title || !this.content) {
         this.saveError = "Prosím vyplňte název a obsah článku.";
