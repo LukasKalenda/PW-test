@@ -6,6 +6,21 @@
       placeholder="Název článku"
       class="w-full p-2 mb-4 border rounded"
     />
+    <div class="mb-4">
+      <label class="block mb-2">Náhledový obrázek:</label>
+      <input
+        type="file"
+        @change="handleImageUpload"
+        accept="image/*"
+        class="mb-2"
+      />
+      <img
+        v-if="imagePreview"
+        :src="imagePreview"
+        alt="Preview"
+        class="max-w-xs"
+      />
+    </div>
     <editor
       api-key="cxpzzuuj1dj3yofi845lzdl6xhbsacrg7ido0yz4ih3dp2yy"
       v-model="content"
@@ -28,7 +43,7 @@
       class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
       :disabled="isSaving"
     >
-      {{ isSaving ? 'Ukládání...' : 'Uložit článek' }}
+      {{ isSaving ? "Ukládání..." : "Uložit článek" }}
     </button>
     <p v-if="saveError" class="text-red-500 mt-2">{{ saveError }}</p>
     <p v-if="saveSuccess" class="text-green-500 mt-2">{{ saveSuccess }}</p>
@@ -37,9 +52,10 @@
 
 <script>
 import Editor from "@tinymce/tinymce-vue";
-import slugify from 'slugify'
-import { db } from "@/firebase";
+import slugify from "slugify";
+import { db, storage } from "@/firebase";
 import { collection, addDoc } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 export default {
   components: {
@@ -49,12 +65,18 @@ export default {
     return {
       title: "",
       content: "",
+      imageFile: null,
+      imagePreview: null,
       isSaving: false,
       saveError: null,
       saveSuccess: null,
     };
   },
   methods: {
+    handleImageUpload(event) {
+      this.imageFile = event.target.files[0];
+      this.imagePreview = URL.createObjectURL(this.imageFile);
+    },
     async saveArticle() {
       if (!this.title || !this.content) {
         this.saveError = "Prosím vyplňte název a obsah článku.";
@@ -67,23 +89,42 @@ export default {
 
       try {
         const slug = slugify(this.title, { lower: true, strict: true });
-        await addDoc(collection(db, "articles"), {
+
+        let imageUrl = null;
+        if (this.imageFile) {
+          try {
+            const storageRef = ref(
+              storage,
+              `article-images/${slug}-${Date.now()}`
+            );
+            const snapshot = await uploadBytes(storageRef, this.imageFile);
+            console.log("Uploaded a blob or file!", snapshot);
+            imageUrl = await getDownloadURL(snapshot.ref);
+            console.log("File available at", imageUrl);
+          } catch (uploadError) {
+            console.error("Chyba při nahrávání obrázku:", uploadError);
+            throw new Error("Nepodařilo se nahrát obrázek.");
+          }
+        }
+
+        const docRef = await addDoc(collection(db, "articles"), {
           title: this.title,
           content: this.content,
           slug: slug,
+          imageUrl: imageUrl,
           createdAt: new Date(),
         });
-        
+
+        console.log("Document written with ID: ", docRef.id);
+
         this.saveSuccess = "Článek byl úspěšně uložen!";
-        // Volitelně: Vyčistit formulář po úspěšném uložení
         this.title = "";
         this.content = "";
-        
-        // Volitelně: Přesměrovat na seznam článků nebo detail právě vytvořeného článku
-        // this.$router.push({ name: 'articleList' });
+        this.imageFile = null;
+        this.imagePreview = null;
       } catch (error) {
         console.error("Chyba při ukládání článku:", error);
-        this.saveError = "Nastala chyba při ukládání článku. Zkuste to prosím znovu.";
+        this.saveError = `Nastala chyba při ukládání článku: ${error.message}`;
       } finally {
         this.isSaving = false;
       }
