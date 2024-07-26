@@ -5,7 +5,7 @@ import ArticleList from '../components/ArticleList.vue';
 import ArticleDetail from '../components/ArticleDetail.vue';
 import ArticleEditor from '../components/ArticleEditor.vue';
 import Login from '../components/Login.vue';
-
+import AdminMessages from '@/components/AdminMessages.vue'
 const routes = [
   {
     path: "/",
@@ -37,6 +37,12 @@ const routes = [
     path: '/clanky',
     name: 'articleList',
     component: ArticleList
+  },
+  {
+    path: '/admin/messages',
+    name: 'adminMessages',
+    component: AdminMessages,
+    meta: { requiresAuth: true }
   }
 ];
 
