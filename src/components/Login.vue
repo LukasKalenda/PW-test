@@ -7,14 +7,14 @@
           type="email"
           placeholder="E-mail"
           required
-          class="w-full p-2 mb-4 border rounded"
+          class="w-full p-2 mb-4 text-black border rounded"
         >
         <input
           v-model="password"
           type="password"
           placeholder="Heslo"
           required
-          class="w-full p-2 mb-4 border rounded"
+          class="w-full p-2 mb-4 text-black border rounded"
         >
         <button
           type="submit"
