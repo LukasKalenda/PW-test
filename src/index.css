@@ -4,5 +4,9 @@
 
 a.link {
     text-decoration: underline;
-    @apply font-semibold
+    @apply font-semibold hover:text-text_ligh
+}
+
+.navlink {
+    @apply block py-6 md:py-2 px-3 text-white
 }

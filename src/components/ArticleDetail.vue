@@ -1,12 +1,21 @@
 <template>
-  <div v-if="article" class="w-full mx-auto max-w-screen-xl article">
-    <h1 class="text-3xl font-bold mb-4">{{ article.title }}</h1>
-    <img
-      v-if="article.imageUrl"
-      :src="article.imageUrl"
-      alt="Article image"
-      class="mb-4 max-w-lg"
-    />
+  <div v-if="article" class="w-full mx-auto max-w-screen-xl p-4">
+    <aside class="flex justify-between px-4 flex-col md:flex-row">
+      <div class="md:w-1/2">
+        <h1 class="text-3xl font-bold mb-4 pt-5">{{ article.title }}</h1>
+        <span
+          >I like to blog about stuff like productivity, business, YouTube, and
+          other stuff I'm interested in. Hopefully you'll find some of it
+          interesting too</span
+        >
+      </div>
+      <img
+        v-if="article.imageUrl"
+        :src="article.imageUrl"
+        alt="Article image"
+        class="mb-4 max-w-sm pt-6 md:pt-0"
+      />
+    </aside>
     <div v-html="article.content"></div>
     <p class="text-gray-600 mt-4">{{ formatDate(article.createdAt) }}</p>
   </div>
@@ -14,10 +23,14 @@
     {{ error }}
   </div>
   <div v-else class="text-gray-600">Načítání článku...</div>
+
+  <GetIn></GetIn>
 </template>
 
 <script>
 import { db } from "@/firebase";
+import GetIn from "./GetInTouch.vue";
+
 import {
   query,
   collection,
@@ -28,6 +41,9 @@ import {
 } from "firebase/firestore";
 
 export default {
+  components: {
+    GetIn
+  },
   data() {
     return {
       article: null,
@@ -76,7 +92,7 @@ export default {
     }
   },
 };
+
 </script>
 
-<style>
-</style>
+<style></style>

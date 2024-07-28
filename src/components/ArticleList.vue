@@ -1,5 +1,5 @@
 <template>
-  <div class="container mx-auto p-4">
+  <div class="w-full mx-auto max-w-screen-xl p-4">
     <h2 class="text-2xl font-bold mb-4">Seznam článků</h2>
     <div v-for="article in articles" :key="article.id" class="mb-4 p-4 border rounded">
       <img v-if="article.imageUrl" :src="article.imageUrl" alt="Article image" class="mb-2 max-w-xs">

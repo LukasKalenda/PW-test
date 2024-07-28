@@ -1,22 +1,26 @@
 <template>
-    <h1 class="text-4xl font-bold text-gray-800 dark:text-gray-200 mt-20">
-      I'm a
-      <span class="text-blue-600 dark:text-blue-400">
-        {{ currentText }}
-      </span>
-      <span class="animate-blink">|</span>
-    </h1>
-    <div class="mt-3">
-        <a href="" class="text-gray-500 hover:text-purple-500">Get in touch ></a>
-    </div>
-  </template>
+  <h1 class="text-4xl font-bold mt-20">
+    Your
+    <span class="text-text_ligh">
+      {{ currentText }}
+    </span>
+    <span class="animate-blink">|</span>
+  </h1>
+  <div class="mt-3 pl-1">
+    <p class="text-gray_dark">I'm Lukas Kalenda, 4 years programming, designing, 3D printing. I specialise in Web Development.</p>
+    <a href="" class="pt-3 text-xl font-bold text-text_ligh inline-flex items-center group">
+      Get in touch
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24" data-v-26d0ee6c=""><g transform="translate(24 0) scale(-1 1)"><g fill="none"><path d="M9 12l5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="il-md-length-15 il-md-duration-3 il-md-delay-0"></path><path d="M9 12l5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="il-md-length-15 il-md-duration-3 il-md-delay-0"></path></g></g></svg>
+    </a>
+  </div>
+</template>
   
   <script>
   import { ref, onMounted, onBeforeUnmount } from 'vue'
   
   export default {
     setup() {
-      const titles = ["Designer", "Developer", "Trainer"]
+      const titles = ["Designer", "Developer"]
       const currentText = ref('')
       const currentIndex = ref(0)
       const charIndex = ref(0)

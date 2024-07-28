@@ -4,7 +4,7 @@
     <input
       v-model="title"
       placeholder="Název článku"
-      class="w-full p-2 mb-4 border rounded"
+      class="w-full p-2 mb-4 border rounded text-bg_dark"
     />
     <div class="mb-4">
       <label class="block mb-2">Náhledový obrázek URL:</label>
@@ -12,7 +12,7 @@
         v-model="imageUrl"
         type="url"
         placeholder="https://example.com/image.jpg"
-        class="w-full p-2 mb-2 border rounded"
+        class="w-full p-2 mb-2 border rounded text-bg_dark"
       />
       <img
         v-if="imageUrl"
